@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  fivem-sever:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: fivem-server
+    container_name: fivem-server-dev
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./server-data/server.cfg:/opt/cfx-server/server.cfg
+      - ./server-data/resources:/opt/cfx-server/resources
+    ports:
+      - "30120:30120/tcp"
+      - "30120:30120/udp"
+      - "40120:40120"
+    command: +exec server.cfg
