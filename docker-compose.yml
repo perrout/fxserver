@@ -1,19 +1,37 @@
 version: "3.8"
 
 services:
-  fivem-sever:
+  fivem:
     build:
       context: ./
       dockerfile: Dockerfile
-    image: fivem-server
-    container_name: fivem-server-dev
+    depends_on:
+      - db
     tty: true
     stdin_open: true
     volumes:
-      - ./server.cfg:/opt/cfx-server/server.cfg
-      - ./resources:/opt/cfx-server/resources
+      - ./server-data/cache:/opt/cfx-server/server-data/cache
+      - ./server-data/config:/opt/cfx-server/server-data/config
+      - ./server-data/crashes:/opt/cfx-server/server-data/crashes
+      - ./server-data/resources:/opt/cfx-server/server-data/resources
+      - ./entrypoint:/usr/bin/entrypoint
     ports:
-      - "30120:30120/tcp"
+      - "30120:30120"
       - "30120:30120/udp"
-      - "40120:40120"
-    command: +exec server.cfg
+  db:
+    image: mariadb
+    restart: always
+    volumes:
+      - ./db:/var/lib/mysql
+    environment:
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: true
+      MARIADB_DATABASE: usina
+      MARIADB_USER: locos
+      MARIADB_PASSWORD: locos@2022
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 8080:8080
